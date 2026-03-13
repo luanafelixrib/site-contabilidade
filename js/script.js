@@ -1,52 +1,76 @@
-// Verifica se o DOM foi totalmente carregado
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Portfólio carregado com sucesso! Iniciando scripts...");
+document.addEventListener("DOMContentLoaded", () => {
 
-    // 1. ROLAGEM SUAVE (SMOOTH SCROLL)
-    // Seleciona todos os links do menu que começam com '#'
-    const menuLinks = document.querySelectorAll('.header nav a[href^="#"]');
+    /* ==================================================
+       NAVBAR COM SOMBRA AO ROLAR A PÁGINA
+    ================================================== */
+    const navbar = document.querySelector(".navbar");
 
-    menuLinks.forEach(link => {
-        link.addEventListener('click', function (event) {
-            event.preventDefault(); // Impede o comportamento padrão de "pulo" do link
-            
-            // Pega o ID da seção clicada (ex: "#projetos")
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add("shadow-sm");
+        } else {
+            navbar.classList.remove("shadow-sm");
+        }
+    });
 
-            // Faz a rolagem suave até a seção
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start' // Alinha a seção no topo da tela
-                });
-            }
+    /* ==================================================
+       BOTÃO VOLTAR AO TOPO
+    ================================================== */
+    const btnTop = document.querySelector(".btn-top");
+
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) {
+            btnTop.style.display = "flex";
+        } else {
+            btnTop.style.display = "none";
+        }
+    });
+
+    btnTop.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
     });
 
-    // 2. ANIMAÇÃO DE FADE-IN (INTERSECTION OBSERVER)
-    // Configurações do observador: dispara quando 15% da seção aparecer na tela
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.15 
-    };
+    /* ==================================================
+       FEEDBACK SIMPLES NO FORMULÁRIO
+       (visual, sem backend)
+    ================================================== */
+    const form = document.querySelector("form");
 
-    // Cria o observador
-    const sectionObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            // Se a seção entrou na área visível
-            if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in-visible');
-                observer.unobserve(entry.target); // Para de observar após a animação acontecer
-            }
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            alert("Mensagem enviada com sucesso! Entraremos em contato 😊");
+            form.reset();
         });
-    }, observerOptions);
+    }
 
-    // Aplica o observador a todas as seções
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(section => {
-        section.classList.add('fade-in-hidden'); // Adiciona a classe que esconde a seção inicialmente
-        sectionObserver.observe(section);
-    });
 });
+
+(function () {
+  emailjs.init("1NGXmu5Huu-MuKs9V");
+})();
+
+document.getElementById("contact-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    emailjs.send("service_gmail", "template_ak9u0xq", {
+      from_name: document.getElementById("name").value,
+      from_email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      service: document.getElementById("service").value,
+      message: document.getElementById("message").value,
+    })
+    .then(function () {
+      alert("Mensagem enviada com sucesso!");
+      document.getElementById("contact-form").reset();
+    })
+    .catch(function (error) {
+      alert("Erro ao enviar mensagem");
+      console.log(error);
+    });
+  });
